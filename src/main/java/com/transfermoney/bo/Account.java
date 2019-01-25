@@ -54,7 +54,7 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "Account [accountNo=" + accountNo + ", customerName=" + customerName + ", balance=" + balance + "]";
+		return "[" + accountNo + " - " + customerName + " : " + balance + "]";
 	}
 
 }
