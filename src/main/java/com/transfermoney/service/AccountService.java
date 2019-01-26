@@ -29,7 +29,7 @@ public class AccountService {
 
 	@GET
 	@Path("/{accountNo}")
-	public Account getAccount(@PathParam("accountNo") int accountNo) {
+	public Account getAccount(@PathParam("accountNo") long accountNo) {
 		// TODO: get db connection and return the account by id
 
 		System.out.println("calling account service getAccount by id: " + accountNo);
@@ -39,7 +39,7 @@ public class AccountService {
 
 	@GET
 	@Path("/{accountNo}/balance")
-	public double getBalance(@PathParam("accountNo") int accountNo) {
+	public double getBalance(@PathParam("accountNo") long accountNo) {
 		// throw error Account not found
 		// get the account balance
 
@@ -50,7 +50,7 @@ public class AccountService {
 
 	@PUT
 	@Path("/{accountNo}/deposit/{amount}")
-	public Account deposit(@PathParam("accountNo") int accountNo, @PathParam("amount") double amount) {
+	public Account deposit(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
 		// TODO: get account by accountNo
 		// TODO: increase balance account.increaseBalance(amount);
@@ -59,7 +59,7 @@ public class AccountService {
 
 	@PUT
 	@Path("/{accountNo}/withdraw/{amount}")
-	public Account withdraw(@PathParam("accountNo") int accountNo, @PathParam("amount") double amount) {
+	public Account withdraw(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
 		// TODO: get account by accountNo
 		// TODO: decrease balance account.decreaseBalance(amount);
@@ -68,7 +68,7 @@ public class AccountService {
 
 	@DELETE
 	@Path("/{accountNo}")
-	public void deleteAccount(@PathParam("accountNo") int accountNo) {
+	public void deleteAccount(@PathParam("accountNo") long accountNo) {
 		// TODO: delete account from db
 		// return status
 	}
