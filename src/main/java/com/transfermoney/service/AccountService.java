@@ -31,6 +31,9 @@ public class AccountService {
 	@Path("/{accountNo}")
 	public Account getAccount(@PathParam("accountNo") int accountNo) {
 		// TODO: get db connection and return the account by id
+
+		System.out.println("calling account service getAccount by id: " + accountNo);
+
 		return null;
 	}
 
@@ -39,6 +42,9 @@ public class AccountService {
 	public double getBalance(@PathParam("accountNo") int accountNo) {
 		// throw error Account not found
 		// get the account balance
+
+		System.out.println("calling account service getBalace by id: " + accountNo);
+
 		return 0.0;
 	}
 
