@@ -26,4 +26,7 @@
 		<servlet-name>Jersey REST Service</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
+	<listener>
+		<listener-class>com.transfermoney.ApplicationListener</listener-class>
+	</listener>
 </web-app>
