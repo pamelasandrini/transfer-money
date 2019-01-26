@@ -12,3 +12,26 @@ With executable jar file created go to target folder and run the following comma
 
 The URL to access the test page is:
 http://localhost:8080/transfermoney/hello.jsp
+
+Rest services:
+
+get
+http://localhost:8080/transfermoney/account/{accountNo}
+
+get
+http://localhost:8080/transfermoney/account/{accountNo}/balance
+
+get
+http://localhost:8080/transfermoney/account/all
+
+put
+http://localhost:8080/transfermoney/account/create
+
+put
+http://localhost:8080/transfermoney/account/{accountNo}/deposit/{amount}
+
+put
+http://localhost:8080/transfermoney/account/{accountNo}/withdraw/{amount}
+
+delete
+http://localhost:8080/transfermoney/account/{accountNo}
