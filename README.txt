@@ -4,7 +4,9 @@ Transfer money is a Java standalone project with embeded Tomcat, using Maven to 
 
 To create the executable jar file run the maven goal: clean install tomcat7:exec-war-only
 
-Make sure you have Java 8 or greater installed.
+Before running the project make sure you have Java 8 or greater installed.
+
+With executable jar file created go to target folder and run the following command to execute the program: java -jar executable.jar
 
 The URL to access the test page is:
 http://localhost:8080/transfermoney/hello.jsp

@@ -34,7 +34,20 @@ public class AccountTest {
 	@Test
 	public void decreaseBalanceTest() {
 
-		account2.decreaseBalance(2000);
+		try {
+			account2.decreaseBalance(2000);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Assert.assertTrue(account2.getBalance() == 500);
+
+		try {
+			account2.decreaseBalance(600);
+		} catch (Exception e) {
+			Assert.assertEquals(e.getMessage(), "value not allowed");
+		}
+		
 		Assert.assertTrue(account2.getBalance() == 500);
 	}
 
