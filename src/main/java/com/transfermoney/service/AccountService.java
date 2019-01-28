@@ -9,51 +9,71 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import com.transfermoney.bo.Account;
+import com.transfermoney.dao.AccountDAO;
+import com.transfermoney.dao.AccountDAOImpl;
 
 @Path("/account")
 public class AccountService {
 
+	private AccountDAO dao = new AccountDAOImpl();
+
 	@PUT
 	@Path("/create")
 	public Account createAccount(Account account) {
-		// TODO: insert account in db
+
+		System.out.println("calling createAccount : " + account);
+		dao.createAccount(account);
+
 		return account;
 	}
 
 	@GET
 	@Path("/all")
 	public List<Account> getAllAccounts() {
-		// TODO: get db connection and return all accounts
-		return null;
+
+		System.out.println("calling getAllAccounts");
+
+		List<Account> accountList = dao.getAccountList();
+		System.out.println("accounts: " + accountList);
+
+		return accountList;
 	}
 
 	@GET
 	@Path("/{accountNo}")
 	public Account getAccount(@PathParam("accountNo") long accountNo) {
-		// TODO: get db connection and return the account by id
 
 		System.out.println("calling account service getAccount by id: " + accountNo);
 
-		return null;
+		Account account = dao.getAccountById(accountNo);
+		System.out.println("account: " + account);
+
+		return account;
 	}
 
 	@GET
 	@Path("/{accountNo}/balance")
 	public double getBalance(@PathParam("accountNo") long accountNo) {
-		// throw error Account not found
-		// get the account balance
 
 		System.out.println("calling account service getBalace by id: " + accountNo);
 
-		return 0.0;
+		// TODO: check if that's correct
+		Account account = getAccount(accountNo);
+		// TODO: throw error Account not found
+		System.out.println("balance: " + account.getBalance());
+
+		return account.getBalance();
 	}
 
 	@PUT
 	@Path("/{accountNo}/deposit/{amount}")
 	public Account deposit(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
-		// TODO: get account by accountNo
-		// TODO: increase balance account.increaseBalance(amount);
+		Account account = getAccount(accountNo);
+		account.increaseBalance(amount);
+
+		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
+
 		return null;
 	}
 
@@ -61,15 +81,25 @@ public class AccountService {
 	@Path("/{accountNo}/withdraw/{amount}")
 	public Account withdraw(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
-		// TODO: get account by accountNo
-		// TODO: decrease balance account.decreaseBalance(amount);
+		Account account = getAccount(accountNo);
+		try {
+			account.decreaseBalance(amount);
+		} catch (Exception e) {
+			System.out.println(e);
+			return null;
+		}
+
+		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
+
 		return null;
 	}
 
 	@DELETE
 	@Path("/{accountNo}")
 	public void deleteAccount(@PathParam("accountNo") long accountNo) {
-		// TODO: delete account from db
-		// return status
+
+		System.out.println("calling deleteAccount, accountNo " + accountNo);
+		dao.deleteAccount(accountNo);
+		// TODO: return status
 	}
 }

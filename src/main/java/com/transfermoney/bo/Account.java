@@ -28,6 +28,13 @@ public class Account {
 		this.accountNo = uniqueId.get();
 	}
 
+	public Account(long accountNo, String customerName, double balance) {
+		this.customerName = customerName;
+		this.balance = balance;
+
+		this.accountNo = accountNo;
+	}
+
 	public String getCustomerName() {
 		return customerName;
 	}
