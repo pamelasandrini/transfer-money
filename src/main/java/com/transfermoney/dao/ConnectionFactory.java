@@ -30,7 +30,7 @@ public abstract class ConnectionFactory {
 	}
 
 	public static void populateTestData() {
-		System.out.println("running populateTestData");
+		System.out.println("running populateTestData using H2 db in memory");
 
 		try (Connection conn = ConnectionFactory.getConnection()) {
 

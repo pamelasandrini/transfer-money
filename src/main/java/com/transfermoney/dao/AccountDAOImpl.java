@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.dbutils.DbUtils;
+
 import com.transfermoney.bo.Account;
 
 public class AccountDAOImpl implements AccountDAO {
@@ -123,8 +125,13 @@ public class AccountDAOImpl implements AccountDAO {
 	public int updateBalance(long accountNo, double newBalance) {
 
 		String sql = "UPDATE ACCOUNT SET BALANCE = ? WHERE ACCOUNT_NO = ?";
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		try {
 
-		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			conn = ConnectionFactory.getConnection();
+			conn.setAutoCommit(false);
+			stmt = conn.prepareStatement(sql);
 
 			stmt.setDouble(1, newBalance);
 			stmt.setLong(2, accountNo);
@@ -139,9 +146,22 @@ public class AccountDAOImpl implements AccountDAO {
 
 			System.out.println("exception in updateBalance " + e);
 
-			// TODO: use hibernate instead
-//			conn.rollback();
+			try {
+
+				conn.rollback();
+
+			} catch (SQLException ex) {
+
+				System.out.println("exception in rollback transaction " + ex);
+
+			}
+
 			return -1;
+		} finally {
+
+			DbUtils.closeQuietly(conn);
+			DbUtils.closeQuietly(stmt);
+
 		}
 
 	}
