@@ -105,7 +105,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 			int exec = stmt.executeUpdate();
 
-			if (exec < 0) {
+			if (exec > 0) {
 				if (logger.isDebugEnabled()) {
 
 					logger.debug("account created successfully");

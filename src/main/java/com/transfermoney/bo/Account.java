@@ -47,13 +47,18 @@ public class Account {
 		return balance;
 	}
 
-	public void increaseBalance(double value) {
-		this.balance += value;
+	public void increaseBalance(double value) throws Exception {
+
+		if (value > 0) {
+			this.balance += value;
+		} else {
+			throw new Exception("value not allowed");
+		}
 	}
 
 	public void decreaseBalance(double value) throws Exception {
 
-		if (balance > 0 && value <= balance) {
+		if (balance > 0 && value <= balance && value > 0) {
 			this.balance -= value;
 		} else {
 			throw new Exception("value not allowed");

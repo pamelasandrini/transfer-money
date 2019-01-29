@@ -74,7 +74,12 @@ public class AccountService {
 	public Account deposit(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
 		Account account = getAccount(accountNo);
-		account.increaseBalance(amount);
+		try {
+			account.increaseBalance(amount);
+		} catch (Exception e) {
+			logger.error(e);
+			return null;
+		}
 
 		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
 

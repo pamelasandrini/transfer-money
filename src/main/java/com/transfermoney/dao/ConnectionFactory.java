@@ -14,10 +14,10 @@ import com.transfermoney.util.PropertiesUtil;
 public abstract class ConnectionFactory {
 
 	private static final Logger logger = Logger.getLogger(ConnectionFactory.class);
-	private static final String url = PropertiesUtil.getProperty("h2_connection_url");
-	private static final String user = PropertiesUtil.getProperty("h2_user");
-	private static final String passwd = PropertiesUtil.getProperty("h2_password");
-	private static final String driver = PropertiesUtil.getProperty("h2_driver");
+	private static final String URL = PropertiesUtil.getProperty("h2_connection_url");
+	private static final String USER = PropertiesUtil.getProperty("h2_user");
+	private static final String PASSWD = PropertiesUtil.getProperty("h2_password");
+	private static final String DRIVER = PropertiesUtil.getProperty("h2_driver");
 
 	/**
 	 * Get h2 db connection.
@@ -26,9 +26,9 @@ public abstract class ConnectionFactory {
 	public static Connection getConnection() {
 
 		try {
-			Class.forName(driver);
+			Class.forName(DRIVER);
 
-			return DriverManager.getConnection(url, user, passwd);
+			return DriverManager.getConnection(URL, USER, PASSWD);
 
 		} catch (ClassNotFoundException | SQLException e) {
 			logger.error("Error in driver registration - " + e);
