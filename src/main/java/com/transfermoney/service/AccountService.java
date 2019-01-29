@@ -7,13 +7,19 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.transfermoney.bo.Account;
 import com.transfermoney.dao.AccountDAO;
 import com.transfermoney.dao.AccountDAOImpl;
 
+@Produces(MediaType.APPLICATION_JSON)
 @Path("/account")
 public class AccountService {
 
@@ -23,92 +29,118 @@ public class AccountService {
 
 	@PUT
 	@Path("/create")
-	public Account createAccount(Account account) {
+	public Response createAccount(Account account) {
 
-		logger.info("calling createAccount : " + account);
-		dao.createAccount(account);
+		logger.info("calling createAccount service");
+		Account accountCreated = dao.createAccount(account);
 
-		return account;
+		return Response.status(accountCreated == null ? Response.Status.NO_CONTENT : Response.Status.OK).build();
 	}
 
 	@GET
 	@Path("/all")
-	public List<Account> getAllAccounts() {
+	public String getAllAccounts() {
 
-		logger.info("calling getAllAccounts");
+		logger.info("calling getAllAccounts service");
 
 		List<Account> accountList = dao.getAccountList();
 		logger.debug("accounts: " + accountList);
 
-		return accountList;
+		if (accountList == null || accountList.isEmpty()) {
+			throw new WebApplicationException(Response.Status.NO_CONTENT);
+		}
+
+		return new Gson().toJson(accountList);
 	}
 
 	@GET
 	@Path("/{accountNo}")
-	public Account getAccount(@PathParam("accountNo") long accountNo) {
+	public String getAccount(@PathParam("accountNo") long accountNo) {
 
-		logger.info("calling account service getAccount by id: " + accountNo);
+		logger.info("calling getAccount service");
 
 		Account account = dao.getAccountById(accountNo);
 		logger.debug("account: " + account);
 
-		return account;
+		if (account == null) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
+		return new Gson().toJson(account);
 	}
 
 	@GET
 	@Path("/{accountNo}/balance")
-	public double getBalance(@PathParam("accountNo") long accountNo) {
+	public String getBalance(@PathParam("accountNo") long accountNo) {
 
-		logger.info("calling account service getBalace by id: " + accountNo);
+		logger.info("calling getBalance service");
 
-		// TODO: check if that's correct
-		Account account = getAccount(accountNo);
-		// TODO: throw error Account not found
+		Account account = new Gson().fromJson(getAccount(accountNo), Account.class);
+
+		if (account == null) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
 		logger.info("balance: " + account.getBalance());
 
-		return account.getBalance();
+		return new Gson().toJson(account.getBalance());
 	}
 
 	@PUT
 	@Path("/{accountNo}/deposit/{amount}")
-	public Account deposit(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
+	public Response deposit(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
-		Account account = getAccount(accountNo);
+		logger.info("calling deposit service");
+
+		Account account = new Gson().fromJson(getAccount(accountNo), Account.class);
+
+		if (account == null) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
 		try {
 			account.increaseBalance(amount);
 		} catch (Exception e) {
 			logger.error(e);
-			return null;
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
 		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
 
-		return null;
+		return Response.status(updateBalance > 0 ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR).build();
 	}
 
 	@PUT
 	@Path("/{accountNo}/withdraw/{amount}")
-	public Account withdraw(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
+	public Response withdraw(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
 
-		Account account = getAccount(accountNo);
+		logger.info("calling withdraw service");
+
+		Account account = new Gson().fromJson(getAccount(accountNo), Account.class);
+
+		if (account == null) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
 		try {
 			account.decreaseBalance(amount);
 		} catch (Exception e) {
 			logger.error(e);
-			return null;
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
 		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
 
-		return null;
+		return Response.status(updateBalance > 0 ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR).build();
 	}
 
 	@DELETE
 	@Path("/{accountNo}")
-	public void deleteAccount(@PathParam("accountNo") long accountNo) {
+	public Response deleteAccount(@PathParam("accountNo") long accountNo) {
 
-		logger.info("calling deleteAccount, accountNo " + accountNo);
+		logger.info("calling deleteAccount service");
 		dao.deleteAccount(accountNo);
-		// TODO: return status
+
+		return Response.status(Response.Status.OK).build();
 	}
 }
