@@ -3,21 +3,26 @@ package com.transfermoney;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.log4j.Logger;
+
 import com.transfermoney.dao.ConnectionFactory;
 
 public class ApplicationListener implements ServletContextListener {
 
+	static final Logger logger = Logger.getLogger(ApplicationListener.class);
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
-		System.out.println("App started!");
-		ConnectionFactory.populateTestData();
+		logger.info("App started!");
+		new ConnectionFactory().populateTestData();
 
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		// TODO Auto-generated method stub
+
+		logger.info("App stopped!");
 
 	}
 

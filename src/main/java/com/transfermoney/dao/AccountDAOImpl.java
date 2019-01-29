@@ -9,16 +9,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.log4j.Logger;
 
 import com.transfermoney.bo.Account;
 
 public class AccountDAOImpl implements AccountDAO {
+
+	static final Logger logger = Logger.getLogger(AccountDAOImpl.class);
 
 	@Override
 	public Account getAccountById(long accountNo) {
 
 		String sql = "SELECT CUSTOMER_NAME, BALANCE FROM ACCOUNT WHERE ACCOUNT_NO = ?";
 		Account account = null;
+
+		logger.info("calling getAccountById : " + accountNo);
 
 		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -34,12 +39,16 @@ public class AccountDAOImpl implements AccountDAO {
 					account = new Account(accountNo, customerName, balance);
 				}
 			}
+			if (logger.isDebugEnabled()) {
+
+				logger.debug("found account " + account);
+			}
 
 			return account;
 
 		} catch (SQLException e) {
 
-			System.out.println("exception in getAccountById " + e);
+			logger.error("exception in getAccountById - " + e);
 			return null;
 		}
 
@@ -50,6 +59,8 @@ public class AccountDAOImpl implements AccountDAO {
 
 		String sql = "SELECT ACCOUNT_NO, CUSTOMER_NAME, BALANCE FROM ACCOUNT";
 		List<Account> accountList = new ArrayList<>();
+
+		logger.info("calling getAccountList ");
 
 		try (Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql);
@@ -64,12 +75,16 @@ public class AccountDAOImpl implements AccountDAO {
 				Account account = new Account(accountNo, customerName, balance);
 				accountList.add(account);
 			}
+			if (logger.isDebugEnabled()) {
+
+				logger.debug("found [" + accountList.size() + "] accounts");
+			}
 
 			return accountList;
 
 		} catch (SQLException e) {
 
-			System.out.println("exception in getAccountList " + e);
+			logger.error("exception in getAccountList - " + e);
 			return Collections.emptyList();
 		}
 
@@ -80,6 +95,8 @@ public class AccountDAOImpl implements AccountDAO {
 
 		String sql = "INSERT INTO ACCOUNT (ACCOUNT_NO, CUSTOMER_NAME, BALANCE) VALUES (?,?,?)";
 
+		logger.info("calling createAccount : " + account);
+
 		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
 			stmt.setLong(1, account.getAccountNo());
@@ -89,14 +106,22 @@ public class AccountDAOImpl implements AccountDAO {
 			int exec = stmt.executeUpdate();
 
 			if (exec < 0) {
+				if (logger.isDebugEnabled()) {
+
+					logger.debug("account created successfully");
+				}
 				return account;
 			} else {
+				if (logger.isDebugEnabled()) {
+
+					logger.debug("error in creating account");
+				}
 				return null;
 			}
 
 		} catch (SQLException e) {
 
-			System.out.println("exception in createAccount " + e);
+			logger.error("exception in createAccount - " + e);
 			return null;
 		}
 
@@ -107,6 +132,8 @@ public class AccountDAOImpl implements AccountDAO {
 
 		String sql = "DELETE ACCOUNT WHERE ACCOUNT_NO = ?";
 
+		logger.info("calling deleteAccount : " + accountNo);
+
 		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
 			stmt.setLong(1, accountNo);
@@ -115,7 +142,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 		} catch (SQLException e) {
 
-			System.out.println("exception in deleteAccount " + e);
+			logger.error("exception in deleteAccount - " + e);
 			return -1;
 		}
 
@@ -125,6 +152,9 @@ public class AccountDAOImpl implements AccountDAO {
 	public int updateBalance(long accountNo, double newBalance) {
 
 		String sql = "UPDATE ACCOUNT SET BALANCE = ? WHERE ACCOUNT_NO = ?";
+
+		logger.info("calling updateBalance accountNo [" + accountNo + "] new balance [" + newBalance + "]");
+
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -140,11 +170,16 @@ public class AccountDAOImpl implements AccountDAO {
 
 			conn.commit();
 
+			if (logger.isDebugEnabled()) {
+
+				logger.debug("balance updated successfully");
+			}
+
 			return executeUpdate;
 
 		} catch (SQLException e) {
 
-			System.out.println("exception in updateBalance " + e);
+			logger.error("exception in updateBalance  - " + e);
 
 			try {
 
@@ -152,8 +187,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 			} catch (SQLException ex) {
 
-				System.out.println("exception in rollback transaction " + ex);
-
+				logger.error("exception in rollback transaction - " + ex);
 			}
 
 			return -1;

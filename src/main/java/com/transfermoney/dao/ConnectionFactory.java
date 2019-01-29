@@ -1,15 +1,17 @@
 package com.transfermoney.dao;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.h2.tools.RunScript;
 
-public abstract class ConnectionFactory {
+public class ConnectionFactory {
 
+	static final Logger logger = Logger.getLogger(ConnectionFactory.class);
 	// TODO: add config file
 	private static String url = "jdbc:h2:mem:transfer-money;DB_CLOSE_DELAY=-1";
 	private static String user = "sa";
@@ -23,27 +25,25 @@ public abstract class ConnectionFactory {
 			return DriverManager.getConnection(url, user, passwd);
 
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			logger.error("Error in driver registration - " + e);
 			return null;
 		}
 
 	}
 
-	public static void populateTestData() {
-		System.out.println("running populateTestData using H2 db in memory");
+	public void populateTestData() {
+		logger.info("running populateTestData using H2 db in memory");
 
 		try (Connection conn = ConnectionFactory.getConnection()) {
 
-			RunScript.execute(conn, new FileReader("src/test/resources/create.sql"));
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(getClass().getResourceAsStream("/create.sql")));
+
+			RunScript.execute(conn, reader);
 
 		} catch (SQLException e) {
 
-			System.out.println("populateTestData(): Error populating user data: " + e);
-			throw new RuntimeException(e);
-
-		} catch (FileNotFoundException e) {
-
-			System.out.println("populateTestData(): Error finding test script file " + e);
+			logger.error("Error populating user data - " + e);
 			throw new RuntimeException(e);
 
 		}
