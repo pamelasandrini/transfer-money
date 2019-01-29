@@ -9,18 +9,20 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 import org.h2.tools.RunScript;
 
-public class ConnectionFactory {
+import com.transfermoney.util.PropertiesUtil;
 
-	static final Logger logger = Logger.getLogger(ConnectionFactory.class);
-	// TODO: add config file
-	private static String url = "jdbc:h2:mem:transfer-money;DB_CLOSE_DELAY=-1";
-	private static String user = "sa";
-	private static String passwd = "";
+public abstract class ConnectionFactory {
+
+	private static final Logger logger = Logger.getLogger(ConnectionFactory.class);
 
 	public static Connection getConnection() {
 
+		String url = PropertiesUtil.getProperty("h2_connection_url");
+		String user = PropertiesUtil.getProperty("h2_user");
+		String passwd = PropertiesUtil.getProperty("h2_password");
+
 		try {
-			Class.forName("org.h2.Driver");
+			Class.forName(PropertiesUtil.getProperty("h2_driver"));
 
 			return DriverManager.getConnection(url, user, passwd);
 
@@ -31,13 +33,13 @@ public class ConnectionFactory {
 
 	}
 
-	public void populateTestData() {
+	public static void populateTestData() {
 		logger.info("running populateTestData using H2 db in memory");
 
 		try (Connection conn = ConnectionFactory.getConnection()) {
 
 			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(getClass().getResourceAsStream("/create.sql")));
+					new InputStreamReader(ConnectionFactory.class.getResourceAsStream("/create.sql")));
 
 			RunScript.execute(conn, reader);
 

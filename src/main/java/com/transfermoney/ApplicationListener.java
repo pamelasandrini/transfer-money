@@ -9,13 +9,13 @@ import com.transfermoney.dao.ConnectionFactory;
 
 public class ApplicationListener implements ServletContextListener {
 
-	static final Logger logger = Logger.getLogger(ApplicationListener.class);
+	private static final Logger logger = Logger.getLogger(ApplicationListener.class);
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
 		logger.info("App started!");
-		new ConnectionFactory().populateTestData();
+		ConnectionFactory.populateTestData();
 
 	}
 

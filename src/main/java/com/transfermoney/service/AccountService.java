@@ -16,8 +16,8 @@ import com.transfermoney.dao.AccountDAOImpl;
 
 @Path("/account")
 public class AccountService {
-	
-	static final Logger logger = Logger.getLogger(AccountService.class);
+
+	private static final Logger logger = Logger.getLogger(AccountService.class);
 
 	private AccountDAO dao = new AccountDAOImpl();
 
