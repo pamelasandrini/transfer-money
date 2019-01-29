@@ -1,16 +1,16 @@
 # transfer-money
 
-Transfer money is a Java standalone project with embeded Tomcat, using Maven to build and manager dependencies.
-
-To execute in debug mode run the maven goal: clean install tomcat7:run
-
-To create the executable jar file run the maven goal: clean install tomcat7:exec-war-only
+Transfer money is a Java standalone project that uses embedded Tomcat, H2 db in memory and Maven.
 
 Before running the project make sure you have Java 8 or greater installed.
 
-With executable jar file created go to target folder and run the following command to execute the program: java -jar executable.jar
+To execute in debug mode run the maven goal: clean install tomcat7:run
 
-Rest services:
+To create a executable jar file run the maven goal: clean install tomcat7:exec-war-only
+
+After the executable jar file creation go to target folder and run the following command to execute it: java -jar executable.jar
+
+Services urls:
 
 get
 http://localhost:8080/transfermoney/account/{accountNo}
