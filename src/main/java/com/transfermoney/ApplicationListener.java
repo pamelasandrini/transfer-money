@@ -7,6 +7,12 @@ import org.apache.log4j.Logger;
 
 import com.transfermoney.dao.ConnectionFactory;
 
+/**
+ * Main class to initialize the application.
+ * 
+ * @author pborsoni
+ *
+ */
 public class ApplicationListener implements ServletContextListener {
 
 	private static final Logger logger = Logger.getLogger(ApplicationListener.class);

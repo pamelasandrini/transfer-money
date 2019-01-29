@@ -1,11 +1,13 @@
 package com.transfermoney.bo;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AccountTest {
 
+	private static final Logger logger = Logger.getLogger(AccountTest.class);
 	private static Account account1;
 	private static Account account2;
 
@@ -37,8 +39,7 @@ public class AccountTest {
 		try {
 			account2.decreaseBalance(2000);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unexpected error in decreaseBalanceTest - " + e);
 		}
 		Assert.assertTrue(account2.getBalance() == 500);
 
@@ -47,7 +48,7 @@ public class AccountTest {
 		} catch (Exception e) {
 			Assert.assertEquals(e.getMessage(), "value not allowed");
 		}
-		
+
 		Assert.assertTrue(account2.getBalance() == 500);
 	}
 
