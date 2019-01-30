@@ -1,6 +1,7 @@
 package com.transfermoney.bo;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -11,28 +12,27 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Account {
 
+	@JsonIgnore
 	private long accountNo;
 
+	@JsonProperty(required = true)
 	private String customerName;
 
+	@JsonProperty(required = true)
 	private double balance;
 
-	private static AtomicInteger uniqueId = new AtomicInteger();
+	public Account() {
+	}
 
 	public Account(String customerName, double balance) {
 		this.customerName = customerName;
 		this.balance = balance;
-
-		uniqueId.incrementAndGet();
-
-		this.accountNo = uniqueId.get();
 	}
 
 	public Account(long accountNo, String customerName, double balance) {
+		this.accountNo = accountNo;
 		this.customerName = customerName;
 		this.balance = balance;
-
-		this.accountNo = accountNo;
 	}
 
 	public String getCustomerName() {
@@ -67,6 +67,10 @@ public class Account {
 
 	public long getAccountNo() {
 		return accountNo;
+	}
+
+	public void setAccountNo(long accountNo) {
+		this.accountNo = accountNo;
 	}
 
 	@Override

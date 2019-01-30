@@ -91,38 +91,40 @@ public class AccountDAOImpl implements AccountDAO {
 	}
 
 	@Override
-	public Account createAccount(Account account) {
+	public long createAccount(Account account) {
 
-		String sql = "INSERT INTO ACCOUNT (ACCOUNT_NO, CUSTOMER_NAME, BALANCE) VALUES (?,?,?)";
+		String sql = "INSERT INTO ACCOUNT (CUSTOMER_NAME, BALANCE) VALUES (?,?)";
 
 		logger.info("calling createAccount : " + account);
+		ResultSet generatedKeys = null;
 
 		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-			stmt.setLong(1, account.getAccountNo());
-			stmt.setString(2, account.getCustomerName());
-			stmt.setDouble(3, account.getBalance());
+			stmt.setString(1, account.getCustomerName());
+			stmt.setDouble(2, account.getBalance());
 
-			int exec = stmt.executeUpdate();
+			int execRow = stmt.executeUpdate();
 
-			if (exec > 0) {
-				if (logger.isDebugEnabled()) {
-
-					logger.debug("account created successfully");
+			if (execRow > 0) {
+				generatedKeys = stmt.getGeneratedKeys();
+				if (generatedKeys.next()) {
+					// return the id
+					return generatedKeys.getLong(1);
 				}
-				return account;
-			} else {
-				if (logger.isDebugEnabled()) {
-
-					logger.debug("error in creating account");
-				}
-				return null;
 			}
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("error in creating account");
+			}
+
+			return execRow;
 
 		} catch (SQLException e) {
 
 			logger.error("exception in createAccount - " + e);
-			return null;
+			return 0;
+		} finally {
+			DbUtils.closeQuietly(generatedKeys);
 		}
 
 	}
@@ -168,11 +170,19 @@ public class AccountDAOImpl implements AccountDAO {
 
 			int executeUpdate = stmt.executeUpdate();
 
-			conn.commit();
+			if (executeUpdate > 0) {
+				conn.commit();
+				if (logger.isDebugEnabled()) {
 
-			if (logger.isDebugEnabled()) {
+					logger.debug("balance updated successfully");
+				}
 
-				logger.debug("balance updated successfully");
+			} else {
+				conn.rollback();
+				if (logger.isDebugEnabled()) {
+
+					logger.debug("error in updating balance");
+				}
 			}
 
 			return executeUpdate;

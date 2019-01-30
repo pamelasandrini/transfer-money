@@ -29,12 +29,16 @@ public class AccountService {
 
 	@PUT
 	@Path("/create")
-	public Response createAccount(Account account) {
+	public long createAccount(Account account) {
 
 		logger.info("calling createAccount service");
-		Account accountCreated = dao.createAccount(account);
+		long id = dao.createAccount(account);
 
-		return Response.status(accountCreated == null ? Response.Status.NO_CONTENT : Response.Status.OK).build();
+		if (id <= 0) {
+			throw new WebApplicationException(Response.Status.NO_CONTENT);
+		}
+
+		return id;
 	}
 
 	@GET
@@ -139,7 +143,11 @@ public class AccountService {
 	public Response deleteAccount(@PathParam("accountNo") long accountNo) {
 
 		logger.info("calling deleteAccount service");
-		dao.deleteAccount(accountNo);
+		int deleteAccount = dao.deleteAccount(accountNo);
+
+		if (deleteAccount <= 0) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
 
 		return Response.status(Response.Status.OK).build();
 	}

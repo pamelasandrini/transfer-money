@@ -30,7 +30,7 @@ public class AccountDAOImplTest {
 	@Test
 	public void getNonExistingAccountByIdTest() {
 
-		Account account = dao.getAccountById(1);
+		Account account = dao.getAccountById(10);
 
 		Assert.assertTrue(account == null);
 	}
@@ -38,23 +38,14 @@ public class AccountDAOImplTest {
 	@Test
 	public void createAccountTest() {
 
-		Account newAccount = new Account("Test", 350);
+		Account newAccount1 = new Account("Test", 350);
+		Account newAccount2 = new Account("Test2", 500);
 
-		Account createdAccount = dao.createAccount(newAccount);
+		long idAccount1 = dao.createAccount(newAccount1);
+		long idAccount2 = dao.createAccount(newAccount2);
 
-		Assert.assertTrue(newAccount.equals(createdAccount));
-		Assert.assertEquals(2, dao.getAccountList().size());
-
-	}
-
-	@Test
-	public void createExistingAccountTest() {
-
-		Account account = dao.getAccountById(0);
-
-		Account createdAccount = dao.createAccount(account);
-
-		Assert.assertTrue(createdAccount == null);
+		Assert.assertFalse(idAccount1 == idAccount2);
+		Assert.assertEquals(3, dao.getAccountList().size());
 
 	}
 
@@ -63,9 +54,10 @@ public class AccountDAOImplTest {
 
 		List<Account> accountList = dao.getAccountList();
 
-		Assert.assertEquals(2, accountList.size());
+		Assert.assertEquals(3, accountList.size());
 		Assert.assertEquals("Karen", accountList.get(0).getCustomerName());
 		Assert.assertTrue(350 == accountList.get(1).getBalance());
+		Assert.assertEquals("Test2", accountList.get(2).getCustomerName());
 	}
 
 	@Test
@@ -76,23 +68,35 @@ public class AccountDAOImplTest {
 
 		account.decreaseBalance(50);
 
-		dao.updateBalance(0, account.getBalance());
+		int updateBalance = dao.updateBalance(0, account.getBalance());
 
 		double newBalance = dao.getAccountById(0).getBalance();
 
 		Assert.assertFalse(oldBalance == newBalance);
+		Assert.assertTrue(updateBalance > 0);
 
 	}
 
 	@Test
 	public void deleteAccountTest() throws Exception {
 
-		dao.deleteAccount(1);
+		Account newAccount = new Account("Test3", 2000);
 
-		Account deletedAccount = dao.getAccountById(1);
+		long idAccount = dao.createAccount(newAccount);
 
-		Assert.assertTrue(deletedAccount == null);
-		Assert.assertEquals(1, dao.getAccountList().size());
+		int deleteAccount = dao.deleteAccount(idAccount);
+
+		Assert.assertTrue(deleteAccount > 0);
+		Assert.assertTrue(dao.getAccountById(idAccount) == null);
+
+	}
+
+	@Test
+	public void deleteNonExistingAccountTest() throws Exception {
+
+		int deleteAccount = dao.deleteAccount(10);
+
+		Assert.assertFalse(deleteAccount > 0);
 
 	}
 }

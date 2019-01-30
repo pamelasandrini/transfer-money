@@ -13,19 +13,10 @@ public class AccountTest {
 
 	@BeforeClass
 	public static void createAccount() {
-		account1 = new Account("Bill", 1000);
-		account2 = new Account("Karen", 2500);
-		account3 = new Account("Mike", 400);
-		account4 = new Account("Tina", 00);
-	}
-
-	@Test
-	public void idGenerationTest() {
-
-		Assert.assertTrue(account1.getAccountNo() == 1);
-		Assert.assertTrue(account2.getAccountNo() == 2);
-		Assert.assertFalse(account1.getAccountNo() == account2.getAccountNo());
-
+		account1 = new Account(1, "Bill", 1000);
+		account2 = new Account(2, "Karen", 2500);
+		account3 = new Account(3, "Mike", 400);
+		account4 = new Account(4, "Tina", 00);
 	}
 
 	@Test
