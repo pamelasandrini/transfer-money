@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Account {
 
-	@JsonIgnore
+	@JsonProperty(required = false)
 	private long accountNo;
 
 	@JsonProperty(required = true)

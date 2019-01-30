@@ -12,20 +12,20 @@ public class TransactionHist {
 
 	private double value;
 
+	public TransactionHist(long accountFrom, long accountTo, double value) {
+		super();
+		this.timestamp = new Date(System.currentTimeMillis());
+		this.accountFrom = accountFrom;
+		this.accountTo = accountTo;
+		this.value = value;
+	}
+
 	public TransactionHist(Date timestamp, long accountFrom, long accountTo, double value) {
 		super();
 		this.timestamp = timestamp;
 		this.accountFrom = accountFrom;
 		this.accountTo = accountTo;
 		this.value = value;
-	}
-
-	public Date getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
 	}
 
 	public long getAccountFrom() {
@@ -50,6 +50,10 @@ public class TransactionHist {
 
 	public void setValue(double value) {
 		this.value = value;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
 	}
 
 }

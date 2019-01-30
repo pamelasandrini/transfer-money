@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.transfermoney.bo.Account;
 import com.transfermoney.dao.AccountDAO;
 import com.transfermoney.dao.AccountDAOImpl;
@@ -43,7 +42,7 @@ public class AccountService {
 
 	@GET
 	@Path("/all")
-	public String getAllAccounts() {
+	public List<Account> getAllAccounts() {
 
 		logger.info("calling getAllAccounts service");
 
@@ -54,12 +53,12 @@ public class AccountService {
 			throw new WebApplicationException(Response.Status.NO_CONTENT);
 		}
 
-		return new Gson().toJson(accountList);
+		return accountList;
 	}
 
 	@GET
 	@Path("/{accountNo}")
-	public String getAccount(@PathParam("accountNo") long accountNo) {
+	public Account getAccount(@PathParam("accountNo") long accountNo) {
 
 		logger.info("calling getAccount service");
 
@@ -70,16 +69,16 @@ public class AccountService {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		return new Gson().toJson(account);
+		return account;
 	}
 
 	@GET
 	@Path("/{accountNo}/balance")
-	public String getBalance(@PathParam("accountNo") long accountNo) {
+	public double getBalance(@PathParam("accountNo") long accountNo) {
 
 		logger.info("calling getBalance service");
 
-		Account account = new Gson().fromJson(getAccount(accountNo), Account.class);
+		Account account = getAccount(accountNo);
 
 		if (account == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
@@ -87,7 +86,7 @@ public class AccountService {
 
 		logger.info("balance: " + account.getBalance());
 
-		return new Gson().toJson(account.getBalance());
+		return account.getBalance();
 	}
 
 	@PUT
@@ -96,7 +95,7 @@ public class AccountService {
 
 		logger.info("calling deposit service");
 
-		Account account = new Gson().fromJson(getAccount(accountNo), Account.class);
+		Account account = getAccount(accountNo);
 
 		if (account == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
@@ -120,7 +119,7 @@ public class AccountService {
 
 		logger.info("calling withdraw service");
 
-		Account account = new Gson().fromJson(getAccount(accountNo), Account.class);
+		Account account = getAccount(accountNo);
 
 		if (account == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
