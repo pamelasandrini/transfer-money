@@ -2,19 +2,28 @@ package com.transfermoney.bo;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TransactionHist {
 
+	@JsonProperty(required = false)
 	private Date timestamp;
 
+	@JsonProperty(required = true)
 	private long accountFrom;
 
+	@JsonProperty(required = true)
 	private long accountTo;
 
+	@JsonProperty(required = true)
 	private double value;
+
+	public TransactionHist() {
+	}
 
 	public TransactionHist(long accountFrom, long accountTo, double value) {
 		super();
-		this.timestamp = new Date(System.currentTimeMillis());
+		setDateNow();
 		this.accountFrom = accountFrom;
 		this.accountTo = accountTo;
 		this.value = value;
@@ -50,6 +59,10 @@ public class TransactionHist {
 
 	public void setValue(double value) {
 		this.value = value;
+	}
+
+	public void setDateNow() {
+		this.timestamp = new Date(System.currentTimeMillis());
 	}
 
 	public Date getTimestamp() {

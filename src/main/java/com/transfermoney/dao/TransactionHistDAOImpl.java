@@ -63,6 +63,10 @@ public class TransactionHistDAOImpl implements TransactionHistDAO {
 
 		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+			if (transaction.getTimestamp() == null) {
+				transaction.setDateNow();
+			}
+
 			stmt.setDate(1, transaction.getTimestamp());
 			stmt.setLong(2, transaction.getAccountFrom());
 			stmt.setLong(3, transaction.getAccountTo());

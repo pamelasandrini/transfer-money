@@ -3,7 +3,6 @@ package com.transfermoney.service;
 import java.util.List;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -32,15 +31,14 @@ public class TransferMoneyRest {
 	private TransactionHistDAO dao = new TransactionHistDAOImpl();
 
 	@POST
-	public int transferMoney(@HeaderParam("accountNoFrom") long accountNoFrom,
-			@HeaderParam("accountNoTo") long accountNoTo, @HeaderParam("value") double value) {
+	public int transferMoney(TransactionHist transaction) {
 
 		logger.info("calling transferMoney service");
 
-		Account accountFrom = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(accountNoFrom))
+		Account accountFrom = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(transaction.getAccountFrom()))
 				.request(MediaType.APPLICATION_JSON).get(Account.class);
 
-		Account accountTo = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(accountNoTo))
+		Account accountTo = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(transaction.getAccountTo()))
 				.request(MediaType.APPLICATION_JSON).get(Account.class);
 
 		if (accountFrom == null || accountTo == null) {
@@ -52,7 +50,7 @@ public class TransferMoneyRest {
 
 		// try to deposit
 
-		dao.createTransactionHist(new TransactionHist(accountNoFrom, accountNoTo, value));
+		dao.createTransactionHist(transaction);
 
 		return 0;
 	}
