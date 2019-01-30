@@ -89,54 +89,6 @@ public class AccountService {
 		return account.getBalance();
 	}
 
-	@PUT
-	@Path("/{accountNo}/deposit/{amount}")
-	public Response deposit(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
-
-		logger.info("calling deposit service");
-
-		Account account = getAccount(accountNo);
-
-		if (account == null) {
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-		}
-
-		try {
-			account.increaseBalance(amount);
-		} catch (Exception e) {
-			logger.error(e);
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-		}
-
-		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
-
-		return Response.status(updateBalance > 0 ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR).build();
-	}
-
-	@PUT
-	@Path("/{accountNo}/withdraw/{amount}")
-	public Response withdraw(@PathParam("accountNo") long accountNo, @PathParam("amount") double amount) {
-
-		logger.info("calling withdraw service");
-
-		Account account = getAccount(accountNo);
-
-		if (account == null) {
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-		}
-
-		try {
-			account.decreaseBalance(amount);
-		} catch (Exception e) {
-			logger.error(e);
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-		}
-
-		int updateBalance = dao.updateBalance(accountNo, account.getBalance());
-
-		return Response.status(updateBalance > 0 ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR).build();
-	}
-
 	@DELETE
 	@Path("/{accountNo}")
 	public Response deleteAccount(@PathParam("accountNo") long accountNo) {

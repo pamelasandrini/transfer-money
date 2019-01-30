@@ -28,12 +28,6 @@ json param: {
     	"balance": 0.0}
 
 
-put
-http://localhost:8080/transfermoney/account/{accountNo}/deposit/{amount}
-
-put
-http://localhost:8080/transfermoney/account/{accountNo}/withdraw/{amount}
-
 delete
 http://localhost:8080/transfermoney/account/{accountNo}
 
