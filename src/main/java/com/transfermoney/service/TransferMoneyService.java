@@ -7,8 +7,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -23,13 +21,12 @@ import com.transfermoney.dao.TransactionHistDAOImpl;
 import com.transfermoney.util.PropertiesUtil;
 
 @Produces(MediaType.APPLICATION_JSON)
-@Path("transfer")
-public class TransferMoneyRest {
+@Path("/transfer")
+public class TransferMoneyService {
 
 	public static final String ACCOUNT_SERVICE_URL = PropertiesUtil.getProperty("account_service_url");
-	private Client client = ClientBuilder.newClient();
 
-	private static final Logger logger = Logger.getLogger(TransferMoneyRest.class);
+	private static final Logger logger = Logger.getLogger(TransferMoneyService.class);
 	private TransactionHistDAO transactionDao = new TransactionHistDAOImpl();
 	private AccountDAO accountDao = new AccountDAOImpl();
 
@@ -39,17 +36,21 @@ public class TransferMoneyRest {
 		logger.info("calling transferMoney service");
 
 		if (transaction.getAccountFrom() == transaction.getAccountTo() || transaction.getValue() <= 0) {
+			logger.error("invalid account or invalid amount");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		Account accountFrom = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(transaction.getAccountFrom()))
-				.request(MediaType.APPLICATION_JSON).get(Account.class);
+		Account accountFrom = accountDao.getAccountById(transaction.getAccountFrom());
 
-		Account accountTo = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(transaction.getAccountTo()))
-				.request(MediaType.APPLICATION_JSON).get(Account.class);
+		if (accountFrom == null) {
+			logger.error("invalid accountFrom");
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
 
-		if (accountFrom == null || accountTo == null) {
-			logger.error("invalid account");
+		Account accountTo = accountDao.getAccountById(transaction.getAccountTo());
+
+		if (accountTo == null) {
+			logger.error("invalid accountTo");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
