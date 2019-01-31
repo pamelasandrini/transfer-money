@@ -3,7 +3,7 @@ package com.transfermoney.dao;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.transfermoney.bo.Account;
@@ -12,8 +12,8 @@ public class AccountDAOImplTest {
 
 	private AccountDAO dao = new AccountDAOImpl();
 
-	@BeforeClass
-	public static void loadTestData() {
+	@Before
+	public void loadTestData() {
 		ConnectionFactory.populateTestData();
 
 	}
@@ -54,40 +54,63 @@ public class AccountDAOImplTest {
 
 		List<Account> accountList = dao.getAccountList();
 
-		Assert.assertEquals(3, accountList.size());
+		Assert.assertEquals(1, accountList.size());
 		Assert.assertEquals("Karen", accountList.get(0).getCustomerName());
-		Assert.assertTrue(350 == accountList.get(1).getBalance());
-		Assert.assertEquals("Test2", accountList.get(2).getCustomerName());
 	}
 
 	@Test
-	public void updateBalanceTest() throws Exception {
+	public void transferAmountTest() throws Exception {
 
-		Account account = dao.getAccountById(0);
-		double oldBalance = account.getBalance();
+		Account newAccount1 = new Account("Test", 350);
+		Account newAccount2 = new Account("Test2", 500);
 
-		account.decreaseBalance(50);
+		newAccount1.setAccountNo(dao.createAccount(newAccount1));
+		newAccount2.setAccountNo(dao.createAccount(newAccount2));
 
-		int updateBalance = dao.updateBalance(0, account.getBalance());
+		newAccount1.decreaseBalance(50);
+		newAccount2.increaseBalance(50);
 
-		double newBalance = dao.getAccountById(0).getBalance();
+		int exec = dao.transferAmount(newAccount1, newAccount2);
+		Account account1WithNewBalance = dao.getAccountById(newAccount1.getAccountNo());
+		Account account2WithNewBalance = dao.getAccountById(newAccount2.getAccountNo());
 
-		Assert.assertFalse(oldBalance == newBalance);
-		Assert.assertTrue(updateBalance > 0);
+		Assert.assertTrue(exec > 0);
+		Assert.assertTrue(account1WithNewBalance.getBalance() == 300);
+		Assert.assertTrue(account2WithNewBalance.getBalance() == 550);
+
+	}
+
+	@Test
+	public void transferAmountInexistingAccountFromTest() throws Exception {
+
+		Account newAccount1 = new Account(10, "Test", 350);
+		Account newAccount2 = new Account(11, "Test2", 500);
+
+		int exec = dao.transferAmount(newAccount1, newAccount2);
+
+		Assert.assertTrue(exec < 0);
+
+	}
+
+	@Test
+	public void transferAmountInexistingAccountToTest() throws Exception {
+
+		Account newAccount1 = dao.getAccountById(0);
+		Account newAccount2 = new Account(11, "Test2", 500);
+
+		int exec = dao.transferAmount(newAccount1, newAccount2);
+
+		Assert.assertTrue(exec < 0);
 
 	}
 
 	@Test
 	public void deleteAccountTest() throws Exception {
 
-		Account newAccount = new Account("Test3", 2000);
+		int exec = dao.deleteAccount(0);
 
-		long idAccount = dao.createAccount(newAccount);
-
-		int deleteAccount = dao.deleteAccount(idAccount);
-
-		Assert.assertTrue(deleteAccount > 0);
-		Assert.assertTrue(dao.getAccountById(idAccount) == null);
+		Assert.assertTrue(exec > 0);
+		Assert.assertTrue(dao.getAccountById(0) == null);
 
 	}
 

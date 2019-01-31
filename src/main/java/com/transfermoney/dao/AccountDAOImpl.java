@@ -151,11 +151,13 @@ public class AccountDAOImpl implements AccountDAO {
 	}
 
 	@Override
-	public int updateBalance(long accountNo, double newBalance) {
+	public int transferAmount(Account accountFrom, Account accountTo) {
 
 		String sql = "UPDATE ACCOUNT SET BALANCE = ? WHERE ACCOUNT_NO = ?";
 
-		logger.info("calling updateBalance accountNo [" + accountNo + "] new balance [" + newBalance + "]");
+		logger.info("calling transferAmount accountNo [" + accountFrom.getAccountNo() + "] new balance ["
+				+ accountFrom.getBalance() + "]. accountNo [" + accountTo.getAccountNo() + "] new balance ["
+				+ accountTo.getBalance() + "]");
 
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -165,10 +167,30 @@ public class AccountDAOImpl implements AccountDAO {
 			conn.setAutoCommit(false);
 			stmt = conn.prepareStatement(sql);
 
-			stmt.setDouble(1, newBalance);
-			stmt.setLong(2, accountNo);
+			stmt.setDouble(1, accountFrom.getBalance());
+			stmt.setLong(2, accountFrom.getAccountNo());
 
 			int executeUpdate = stmt.executeUpdate();
+
+			if (executeUpdate > 0) {
+				if (logger.isDebugEnabled()) {
+
+					logger.debug("balance updated successfully");
+				}
+
+			} else {
+				conn.rollback();
+				if (logger.isDebugEnabled()) {
+
+					logger.debug("error in updating balance");
+				}
+				return -1;
+			}
+
+			stmt.setDouble(1, accountTo.getBalance());
+			stmt.setLong(2, accountTo.getAccountNo());
+
+			executeUpdate = stmt.executeUpdate();
 
 			if (executeUpdate > 0) {
 				conn.commit();
@@ -183,6 +205,7 @@ public class AccountDAOImpl implements AccountDAO {
 
 					logger.debug("error in updating balance");
 				}
+				return -1;
 			}
 
 			return executeUpdate;

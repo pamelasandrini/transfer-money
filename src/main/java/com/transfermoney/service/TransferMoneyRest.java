@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
 
 import com.transfermoney.bo.Account;
 import com.transfermoney.bo.TransactionHist;
+import com.transfermoney.dao.AccountDAO;
+import com.transfermoney.dao.AccountDAOImpl;
 import com.transfermoney.dao.TransactionHistDAO;
 import com.transfermoney.dao.TransactionHistDAOImpl;
 import com.transfermoney.util.PropertiesUtil;
@@ -24,16 +26,21 @@ import com.transfermoney.util.PropertiesUtil;
 @Path("transfer")
 public class TransferMoneyRest {
 
-	private static final String ACCOUNT_SERVICE_URL = PropertiesUtil.getProperty("account_service_url");
+	public static final String ACCOUNT_SERVICE_URL = PropertiesUtil.getProperty("account_service_url");
 	private Client client = ClientBuilder.newClient();
 
 	private static final Logger logger = Logger.getLogger(TransferMoneyRest.class);
-	private TransactionHistDAO dao = new TransactionHistDAOImpl();
+	private TransactionHistDAO transactionDao = new TransactionHistDAOImpl();
+	private AccountDAO accountDao = new AccountDAOImpl();
 
 	@POST
-	public int transferMoney(TransactionHist transaction) {
+	public Response transferMoney(TransactionHist transaction) {
 
 		logger.info("calling transferMoney service");
+
+		if (transaction.getAccountFrom() == transaction.getAccountTo() || transaction.getValue() <= 0) {
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
 
 		Account accountFrom = client.target(ACCOUNT_SERVICE_URL).path(String.valueOf(transaction.getAccountFrom()))
 				.request(MediaType.APPLICATION_JSON).get(Account.class);
@@ -42,17 +49,29 @@ public class TransferMoneyRest {
 				.request(MediaType.APPLICATION_JSON).get(Account.class);
 
 		if (accountFrom == null || accountTo == null) {
+			logger.error("invalid account");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		// get accountFrom balance
-		// try to withdraw
+		try {
+			accountFrom.decreaseBalance(transaction.getValue());
+			accountTo.increaseBalance(transaction.getValue());
+		} catch (Exception e) {
+			logger.error("invalid amount");
+			throw new WebApplicationException("Could not perform the transaction", Response.Status.BAD_REQUEST);
+		}
 
-		// try to deposit
+		int transferExec = accountDao.transferAmount(accountFrom, accountTo);
 
-		dao.createTransactionHist(transaction);
+		if (transferExec <= 0) {
+			logger.error("an error has occurred while transfering amount");
+			throw new WebApplicationException("Could not perform the transaction",
+					Response.Status.INTERNAL_SERVER_ERROR);
+		}
 
-		return 0;
+		transactionDao.createTransactionHist(transaction);
+
+		return Response.status(Response.Status.OK).build();
 	}
 
 	@GET
@@ -61,9 +80,10 @@ public class TransferMoneyRest {
 
 		logger.info("calling getAllTransactions service");
 
-		List<TransactionHist> allTransactions = dao.getAllTransactions();
+		List<TransactionHist> allTransactions = transactionDao.getAllTransactions();
 
 		if (allTransactions == null || allTransactions.isEmpty()) {
+			logger.error("no transactions found");
 			throw new WebApplicationException(Response.Status.NO_CONTENT);
 		}
 

@@ -34,6 +34,7 @@ public class AccountService {
 		long id = dao.createAccount(account);
 
 		if (id <= 0) {
+			logger.error("an error has occurred while creating the account");
 			throw new WebApplicationException(Response.Status.NO_CONTENT);
 		}
 
@@ -50,6 +51,7 @@ public class AccountService {
 		logger.debug("accounts: " + accountList);
 
 		if (accountList == null || accountList.isEmpty()) {
+			logger.error("no accounts found");
 			throw new WebApplicationException(Response.Status.NO_CONTENT);
 		}
 
@@ -66,6 +68,7 @@ public class AccountService {
 		logger.debug("account: " + account);
 
 		if (account == null) {
+			logger.error("invalid account");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
@@ -81,6 +84,7 @@ public class AccountService {
 		Account account = getAccount(accountNo);
 
 		if (account == null) {
+			logger.error("invalid account");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
@@ -97,6 +101,7 @@ public class AccountService {
 		int deleteAccount = dao.deleteAccount(accountNo);
 
 		if (deleteAccount <= 0) {
+			logger.error("an error has occurred while deleting the account");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 

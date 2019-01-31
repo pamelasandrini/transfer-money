@@ -39,13 +39,14 @@ public interface AccountDAO {
 	public int deleteAccount(long accountNo);
 
 	/**
-	 * Update the account balance to <code>newBalance</code>
+	 * Withdraw the amount from <code>accountFrom</code> and deposit the amount to
+	 * <code>accountTo</code>
 	 * 
-	 * @param accountNo
-	 * @param newBalance
+	 * @param accountFrom
+	 * @param accountTo
 	 * @return more than zero if balance is updated successfully, zero or less than
 	 *         zero if any error has occurred
 	 */
-	public int updateBalance(long accountNo, double newBalance);
+	public int transferAmount(Account accountFrom, Account accountTo);
 
 }
