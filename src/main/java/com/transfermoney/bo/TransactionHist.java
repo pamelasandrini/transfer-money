@@ -16,7 +16,7 @@ public class TransactionHist {
 	private long accountTo;
 
 	@JsonProperty(required = true)
-	private double value;
+	private double amount;
 
 	public TransactionHist() {
 	}
@@ -26,7 +26,7 @@ public class TransactionHist {
 		setDateNow();
 		this.accountFrom = accountFrom;
 		this.accountTo = accountTo;
-		this.value = value;
+		this.amount = value;
 	}
 
 	public TransactionHist(Date timestamp, long accountFrom, long accountTo, double value) {
@@ -34,7 +34,7 @@ public class TransactionHist {
 		this.timestamp = timestamp;
 		this.accountFrom = accountFrom;
 		this.accountTo = accountTo;
-		this.value = value;
+		this.amount = value;
 	}
 
 	public long getAccountFrom() {
@@ -53,12 +53,12 @@ public class TransactionHist {
 		this.accountTo = accountTo;
 	}
 
-	public double getValue() {
-		return value;
+	public double getAmount() {
+		return amount;
 	}
 
-	public void setValue(double value) {
-		this.value = value;
+	public void setAmount(double amount) {
+		this.amount = amount;
 	}
 
 	public void setDateNow() {

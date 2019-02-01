@@ -35,7 +35,7 @@ public class AccountService {
 
 		if (id <= 0) {
 			logger.error("an error has occurred while creating the account");
-			throw new WebApplicationException(Response.Status.NO_CONTENT);
+			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		}
 
 		return id;

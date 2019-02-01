@@ -21,7 +21,7 @@ public class AccountDAOImplTest {
 	@Test
 	public void getAccountByIdTest() {
 
-		Account account = dao.getAccountById(0);
+		Account account = dao.getAccountById(1);
 
 		Assert.assertFalse(account == null);
 		Assert.assertEquals("Karen", account.getCustomerName());
@@ -39,13 +39,12 @@ public class AccountDAOImplTest {
 	public void createAccountTest() {
 
 		Account newAccount1 = new Account("Test", 350);
-		Account newAccount2 = new Account("Test2", 500);
 
 		long idAccount1 = dao.createAccount(newAccount1);
-		long idAccount2 = dao.createAccount(newAccount2);
 
-		Assert.assertFalse(idAccount1 == idAccount2);
-		Assert.assertEquals(3, dao.getAccountList().size());
+		Account accountCreated = dao.getAccountById(idAccount1);
+
+		Assert.assertFalse(accountCreated == null);
 
 	}
 
@@ -54,7 +53,8 @@ public class AccountDAOImplTest {
 
 		List<Account> accountList = dao.getAccountList();
 
-		Assert.assertEquals(1, accountList.size());
+		Assert.assertFalse(accountList == null);
+		Assert.assertFalse(accountList.isEmpty());
 		Assert.assertEquals("Karen", accountList.get(0).getCustomerName());
 	}
 
@@ -67,8 +67,8 @@ public class AccountDAOImplTest {
 		newAccount1.setAccountNo(dao.createAccount(newAccount1));
 		newAccount2.setAccountNo(dao.createAccount(newAccount2));
 
-		newAccount1.decreaseBalance(50);
-		newAccount2.increaseBalance(50);
+		newAccount1.withdraw(50);
+		newAccount2.deposit(50);
 
 		int exec = dao.transferAmount(newAccount1, newAccount2);
 		Account account1WithNewBalance = dao.getAccountById(newAccount1.getAccountNo());
@@ -95,7 +95,7 @@ public class AccountDAOImplTest {
 	@Test
 	public void transferAmountInexistingAccountToTest() throws Exception {
 
-		Account newAccount1 = dao.getAccountById(0);
+		Account newAccount1 = dao.getAccountById(1);
 		Account newAccount2 = new Account(11, "Test2", 500);
 
 		int exec = dao.transferAmount(newAccount1, newAccount2);
@@ -107,10 +107,10 @@ public class AccountDAOImplTest {
 	@Test
 	public void deleteAccountTest() throws Exception {
 
-		int exec = dao.deleteAccount(0);
+		int exec = dao.deleteAccount(2);
 
 		Assert.assertTrue(exec > 0);
-		Assert.assertTrue(dao.getAccountById(0) == null);
+		Assert.assertTrue(dao.getAccountById(2) == null);
 
 	}
 

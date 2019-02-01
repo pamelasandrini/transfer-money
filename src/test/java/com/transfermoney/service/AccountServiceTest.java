@@ -19,13 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.transfermoney.bo.Account;
-import com.transfermoney.dao.AccountDAO;
-import com.transfermoney.dao.AccountDAOImpl;
 import com.transfermoney.dao.ConnectionFactory;
 
 public class AccountServiceTest extends JerseyTest {
-
-	private AccountDAO dao = new AccountDAOImpl();
 
 	@Override
 	protected Application configure() {
@@ -36,15 +32,6 @@ public class AccountServiceTest extends JerseyTest {
 	public void loadTestData() {
 		ConnectionFactory.populateTestData();
 
-	}
-
-	@Test
-	public void getAllAccountsEmptyListTest() {
-
-		dao.deleteAccount(0);
-		Response response = target("/account/all").request().get();
-
-		assertEquals("Http Response should be 204: ", Status.NO_CONTENT.getStatusCode(), response.getStatus());
 	}
 
 	@Test
@@ -62,14 +49,14 @@ public class AccountServiceTest extends JerseyTest {
 
 	@Test
 	public void getAccountsTest() {
-		Response response = target("/account/0").request().get();
+		Response response = target("/account/1").request().get();
 
 		assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
 		assertEquals("Http Content-Type should be: ", MediaType.APPLICATION_JSON,
 				response.getHeaderString(HttpHeaders.CONTENT_TYPE));
 
 		Account content = response.readEntity(Account.class);
-		assertEquals(0, content.getAccountNo());
+		assertEquals(1, content.getAccountNo());
 	}
 
 	@Test
@@ -94,19 +81,19 @@ public class AccountServiceTest extends JerseyTest {
 
 		Long content = response.readEntity(long.class);
 
-		assertEquals(1, content.longValue());
+		assertTrue(0 != content.longValue());
 	}
 
 	@Test
 	public void getBalanceTest() {
-		Response response = target("/account/0/balance").request().get();
+		Response response = target("/account/1/balance").request().get();
 
 		assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
 		assertEquals("Http Content-Type should be: ", MediaType.APPLICATION_JSON,
 				response.getHeaderString(HttpHeaders.CONTENT_TYPE));
 
 		Double content = response.readEntity(double.class);
-		assertTrue(content == 1500);
+		assertTrue(content == 1000);
 	}
 
 	@Test
@@ -121,7 +108,7 @@ public class AccountServiceTest extends JerseyTest {
 	@Test
 	public void deleteAccountTest() {
 
-		Response response = target("/account/0").request().delete();
+		Response response = target("/account/2").request().delete();
 
 		assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
 

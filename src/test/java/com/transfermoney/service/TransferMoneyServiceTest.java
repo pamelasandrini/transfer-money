@@ -15,7 +15,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.transfermoney.bo.Account;
@@ -23,19 +24,58 @@ import com.transfermoney.bo.TransactionHist;
 import com.transfermoney.dao.AccountDAO;
 import com.transfermoney.dao.AccountDAOImpl;
 import com.transfermoney.dao.ConnectionFactory;
+import com.transfermoney.dao.TransactionHistDAO;
+import com.transfermoney.dao.TransactionHistDAOImpl;
 
 public class TransferMoneyServiceTest extends JerseyTest {
 
-	private AccountDAO dao = new AccountDAOImpl();
+	private AccountDAO accountDao = new AccountDAOImpl();
+	private TransactionHistDAO transactionDao = new TransactionHistDAOImpl();
 
 	@Override
 	protected Application configure() {
 		return new ResourceConfig(TransferMoneyService.class);
 	}
 
-	@BeforeClass
-	public static void loadTestData() {
+	@Before
+	public void loadTestData() {
 		ConnectionFactory.populateTestData();
+
+	}
+
+	@Ignore
+	@Test
+	public void transferMoneyMultiThreadTest() {
+
+		Account newAccount1 = new Account("test1", 1000);
+		Account newAccount2 = new Account("test2", 0);
+		long accountFrom = accountDao.createAccount(newAccount1);
+		long accountTo = accountDao.createAccount(newAccount2);
+
+		for (int i = 0; i < 1000; i++) {
+
+			TransactionHist transaction = new TransactionHist(accountFrom, accountTo, 1);
+
+			Response response = target("/transfer").request()
+					.post(Entity.entity(transaction, MediaType.APPLICATION_JSON));
+			assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
+
+		}
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		List<TransactionHist> allTransactions = transactionDao.getAllTransactions();
+		double account1NewBalace = accountDao.getAccountById(accountFrom).getBalance();
+		double account2NewBalace = accountDao.getAccountById(accountTo).getBalance();
+
+		assertTrue(allTransactions.size() > 1000);
+		assertTrue(account1NewBalace == 0);
+		assertTrue(account2NewBalace == 1000);
 
 	}
 
@@ -78,45 +118,53 @@ public class TransferMoneyServiceTest extends JerseyTest {
 	@Test
 	public void transferMoneyTest() {
 
-		Account newAccount1 = new Account("test1", 1500);
-		Account newAccount2 = new Account("test2", 300);
-		newAccount1.setAccountNo(dao.createAccount(newAccount1));
-		newAccount2.setAccountNo(dao.createAccount(newAccount2));
-
-		TransactionHist transaction = new TransactionHist(newAccount1.getAccountNo(), newAccount2.getAccountNo(), 300);
+		TransactionHist transaction = new TransactionHist(1, 2, 300);
 
 		Response response = target("/transfer").request().post(Entity.entity(transaction, MediaType.APPLICATION_JSON));
 
-		Account account1NewBalance = dao.getAccountById(newAccount1.getAccountNo());
-		Account account2NewBalance = dao.getAccountById(newAccount2.getAccountNo());
+		try {
+			// sleep due to persistence
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Account account1NewBalance = accountDao.getAccountById(1);
+		Account account2NewBalance = accountDao.getAccountById(2);
 
 		assertEquals("Http Response should be 200: ", Status.OK.getStatusCode(), response.getStatus());
 		assertEquals("Http Content-Type should be: ", null, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
-		assertTrue(account1NewBalance.getBalance() == 1200);
-		assertTrue(account2NewBalance.getBalance() == 600);
+		assertTrue(account1NewBalance.getBalance() == 700);
+		assertTrue(account2NewBalance.getBalance() == 2800);
 
 	}
 
 	@Test
 	public void transferMoneyInvalidBalanceTest() {
+		double account1OldBalance = accountDao.getAccountById(1).getBalance();
+		double account2OldBalance = accountDao.getAccountById(2).getBalance();
 
-		Account newAccount1 = new Account("test1", 1500);
-		Account newAccount2 = new Account("test2", 300);
-		newAccount1.setAccountNo(dao.createAccount(newAccount1));
-		newAccount2.setAccountNo(dao.createAccount(newAccount2));
-
-		TransactionHist transaction = new TransactionHist(newAccount1.getAccountNo(), newAccount2.getAccountNo(), 2000);
+		TransactionHist transaction = new TransactionHist(1, 2, 2000);
 
 		Response response = target("/transfer").request().post(Entity.entity(transaction, MediaType.APPLICATION_JSON));
 
-		Account account1NewBalance = dao.getAccountById(newAccount1.getAccountNo());
-		Account account2NewBalance = dao.getAccountById(newAccount2.getAccountNo());
+		try {
+			// sleep due to persistence
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		double account1NewBalance = accountDao.getAccountById(1).getBalance();
+		double account2NewBalance = accountDao.getAccountById(2).getBalance();
 
 		assertEquals("Http Response should be 400: ", Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		assertEquals("Http Content-Type should be: ", null, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
 
-		assertTrue(account1NewBalance.getBalance() == 1500);
-		assertTrue(account2NewBalance.getBalance() == 300);
+		assertTrue(account1OldBalance == account1NewBalance);
+		assertTrue(account2OldBalance == account2NewBalance);
 	}
 
 	@Test

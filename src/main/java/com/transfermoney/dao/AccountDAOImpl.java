@@ -151,13 +151,11 @@ public class AccountDAOImpl implements AccountDAO {
 	}
 
 	@Override
-	public int transferAmount(Account accountFrom, Account accountTo) {
+	public synchronized int transferAmount(Account accountFrom, Account accountTo) {
 
 		String sql = "UPDATE ACCOUNT SET BALANCE = ? WHERE ACCOUNT_NO = ?";
 
-		logger.info("calling transferAmount accountNo [" + accountFrom.getAccountNo() + "] new balance ["
-				+ accountFrom.getBalance() + "]. accountNo [" + accountTo.getAccountNo() + "] new balance ["
-				+ accountTo.getBalance() + "]");
+		logger.info("calling transferAmount");
 
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -172,18 +170,10 @@ public class AccountDAOImpl implements AccountDAO {
 
 			int executeUpdate = stmt.executeUpdate();
 
-			if (executeUpdate > 0) {
-				if (logger.isDebugEnabled()) {
+			if (executeUpdate <= 0) {
 
-					logger.debug("balance updated successfully");
-				}
-
-			} else {
 				conn.rollback();
-				if (logger.isDebugEnabled()) {
 
-					logger.debug("error in updating balance");
-				}
 				return -1;
 			}
 
@@ -194,17 +184,10 @@ public class AccountDAOImpl implements AccountDAO {
 
 			if (executeUpdate > 0) {
 				conn.commit();
-				if (logger.isDebugEnabled()) {
-
-					logger.debug("balance updated successfully");
-				}
 
 			} else {
 				conn.rollback();
-				if (logger.isDebugEnabled()) {
 
-					logger.debug("error in updating balance");
-				}
 				return -1;
 			}
 

@@ -12,19 +12,17 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
+import com.transfermoney.TransferThread;
 import com.transfermoney.bo.Account;
 import com.transfermoney.bo.TransactionHist;
 import com.transfermoney.dao.AccountDAO;
 import com.transfermoney.dao.AccountDAOImpl;
 import com.transfermoney.dao.TransactionHistDAO;
 import com.transfermoney.dao.TransactionHistDAOImpl;
-import com.transfermoney.util.PropertiesUtil;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/transfer")
 public class TransferMoneyService {
-
-	public static final String ACCOUNT_SERVICE_URL = PropertiesUtil.getProperty("account_service_url");
 
 	private static final Logger logger = Logger.getLogger(TransferMoneyService.class);
 	private TransactionHistDAO transactionDao = new TransactionHistDAOImpl();
@@ -33,43 +31,49 @@ public class TransferMoneyService {
 	@POST
 	public Response transferMoney(TransactionHist transaction) {
 
-		logger.info("calling transferMoney service");
+		String threadname = Thread.currentThread().getName();
+		logger.info(threadname + " - calling transferMoney service");
 
-		if (transaction.getAccountFrom() == transaction.getAccountTo() || transaction.getValue() <= 0) {
-			logger.error("invalid account or invalid amount");
+		double amount = transaction.getAmount();
+		if (amount <= 0) {
+			logger.error("invalid amount.");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		Account accountFrom = accountDao.getAccountById(transaction.getAccountFrom());
+		long accountNoFrom = transaction.getAccountFrom();
+		long accountNoTo = transaction.getAccountTo();
+		if (accountNoFrom == accountNoTo) {
+			logger.error("invalid account. Same account.");
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
+		Account accountFrom = accountDao.getAccountById(accountNoFrom);
 
 		if (accountFrom == null) {
-			logger.error("invalid accountFrom");
+			logger.error("invalid source account.");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		Account accountTo = accountDao.getAccountById(transaction.getAccountTo());
+		Account accountTo = accountDao.getAccountById(accountNoTo);
 
 		if (accountTo == null) {
-			logger.error("invalid accountTo");
+			logger.error("invalid target account.");
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+		}
+
+		if (amount > accountFrom.getBalance() || accountFrom.getBalance() <= 0) {
+			logger.error("could not perform the transaction, invalid amount.");
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
 		try {
-			accountFrom.decreaseBalance(transaction.getValue());
-			accountTo.increaseBalance(transaction.getValue());
+			TransferThread thread = new TransferThread(accountNoFrom, accountNoTo, amount, accountDao, logger);
+			thread.start();
+
 		} catch (Exception e) {
-			logger.error("invalid amount");
-			throw new WebApplicationException("Could not perform the transaction", Response.Status.BAD_REQUEST);
-		}
-
-		int transferExec = accountDao.transferAmount(accountFrom, accountTo);
-
-		if (transferExec <= 0) {
-			logger.error("an error has occurred while transfering amount");
 			throw new WebApplicationException("Could not perform the transaction",
 					Response.Status.INTERNAL_SERVER_ERROR);
 		}
-
 		transactionDao.createTransactionHist(transaction);
 
 		return Response.status(Response.Status.OK).build();

@@ -1,6 +1,6 @@
 # transfer-money
 
-Transfer money is a Java standalone project that uses embedded Tomcat, H2 db in memory and Maven.
+Transfer money is a Java standalone project that uses Jersey framework, embedded Tomcat, H2 db in memory and Maven.
 
 Before running the project make sure you have Java 8 or greater installed.
 
@@ -41,5 +41,5 @@ http://localhost:8080/transfermoney/transfer
 json param: {
 "accountFrom": 0,
  "accountTo": 1,
-"value" : 450.90
+ "amount" : 450.90
 }

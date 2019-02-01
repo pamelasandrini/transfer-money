@@ -31,7 +31,7 @@ public abstract class ConnectionFactory {
 			return DriverManager.getConnection(URL, USER, PASSWD);
 
 		} catch (ClassNotFoundException | SQLException e) {
-			logger.error("Error in driver registration - " + e);
+			logger.error("Error during driver registration - " + e);
 			throw new RuntimeException(e);
 		}
 
@@ -52,7 +52,7 @@ public abstract class ConnectionFactory {
 
 		} catch (SQLException e) {
 
-			logger.error("Error populating user data - " + e);
+			logger.error("Error during loading test data - " + e);
 			throw new RuntimeException(e);
 
 		}

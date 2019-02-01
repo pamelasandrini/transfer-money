@@ -70,7 +70,7 @@ public class TransactionHistDAOImpl implements TransactionHistDAO {
 			stmt.setDate(1, transaction.getTimestamp());
 			stmt.setLong(2, transaction.getAccountFrom());
 			stmt.setLong(3, transaction.getAccountTo());
-			stmt.setDouble(4, transaction.getValue());
+			stmt.setDouble(4, transaction.getAmount());
 
 			return stmt.executeUpdate();
 

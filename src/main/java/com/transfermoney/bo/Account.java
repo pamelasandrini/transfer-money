@@ -42,26 +42,16 @@ public class Account {
 		this.customerName = customerName;
 	}
 
-	public double getBalance() {
+	public synchronized double getBalance() {
 		return balance;
 	}
 
-	public void increaseBalance(double value) throws Exception {
-
-		if (value > 0) {
-			this.balance += value;
-		} else {
-			throw new Exception("value not allowed");
-		}
+	public synchronized void deposit(double amount) {
+		balance += amount;
 	}
 
-	public void decreaseBalance(double value) throws Exception {
-
-		if (balance > 0 && value <= balance && value > 0) {
-			this.balance -= value;
-		} else {
-			throw new Exception("value not allowed");
-		}
+	public synchronized void withdraw(double amount) {
+		balance -= amount;
 	}
 
 	public long getAccountNo() {
