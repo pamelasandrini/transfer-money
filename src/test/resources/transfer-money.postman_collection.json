@@ -1,0 +1,266 @@
+{
+	"info": {
+		"_postman_id": "4cbe652f-36e0-4649-bea9-9be7bbe2aa83",
+		"name": "transfer-money",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "withdraw",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accountNo\": 1,\n    \"customerName\": \"Test2\",\n    \"balance\": 1800\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/withdraw/60",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"withdraw",
+						"60"
+					]
+				},
+				"description": "put request to withdraw money"
+			},
+			"response": []
+		},
+		{
+			"name": "deposit",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/1/deposit/40",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"1",
+						"deposit",
+						"40"
+					]
+				},
+				"description": "put request to deposit money"
+			},
+			"response": []
+		},
+		{
+			"name": "get account",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete account",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get balance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/0/balance",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"0",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create json",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \t\"customerName\": \"Test2\",\n    \t\"balance\": 1800\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/account/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"account",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "transferMoney",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \t\"accountFrom\": 2,\n    \t\"accountTo\": 1,\n    \t\"amount\" : 2000\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/transfer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/transfermoney/transfer/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"transfermoney",
+						"transfer",
+						"all"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
